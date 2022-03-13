@@ -1,7 +1,15 @@
+from pathlib import Path
+
+import itertools
 import pandas as pd
 from Bio import SeqIO
-from pathlib import Path
-from typing import Union
+
+from typing import Any, Iterable, Tuple, Union
+
+
+def split_into_chunks(iterable: Iterable[Any], chunk_size: int) -> Iterable[Tuple[Any]]:
+    tmp = iter(iterable)
+    return iter(lambda: tuple(itertools.islice(tmp, chunk_size)), ())
 
 
 def fasta2csv(path: Union[str, Path], verbose: bool = True) -> None:

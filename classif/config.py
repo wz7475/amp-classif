@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
-from typing import List
 
-DBAASP_URL = "https://dbaasp.org/prediction/special/"
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -20,4 +19,5 @@ class Config:
         "Saccharomyces cerevisiae",
     ])
     DBAASP_URL: str = "https://dbaasp.org/prediction/special/"
+    DBAASP_CHUNK_SIZE: int = 400
     AMPSCANNER_MAX_LENGTH: int = 200
