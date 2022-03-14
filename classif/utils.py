@@ -31,3 +31,11 @@ def clean_dbaasp_preds(df: pd.DataFrame) -> pd.DataFrame:
     df["Class"].map({"Active": 1.0, "Not Active": 0.0}).astype("float64")
     df.columns = map(lambda x: x.lower().replace(" ", "_"), df.columns)
     return df
+
+
+def clean_amplify_preds(df: pd.DataFrame) -> pd.DataFrame:
+    df.columns = df.columns.str.lower()
+    df.rename({"probability_score": "score"}, axis="columns", inplace=True)
+    df["prediction_num"] = (df["prediction"] == "AMP").astype("float")
+    return df
+
