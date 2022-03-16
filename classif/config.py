@@ -20,4 +20,7 @@ class Config:
     ])
     DBAASP_URL: str = "https://dbaasp.org/prediction/special/"
     DBAASP_CHUNK_SIZE: int = 400
+
+    STM_URL: str = "https://www.portoreports.com/stm"
+
     AMPSCANNER_MAX_LENGTH: int = 200
