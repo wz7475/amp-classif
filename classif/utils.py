@@ -1,15 +1,25 @@
+import math
 from pathlib import Path
 
 import itertools
 import pandas as pd
 from Bio import SeqIO
 
-from typing import Any, Iterable, Tuple, Union
+from typing import Any, Iterable, List, Tuple, Union
 
 
 def split_into_chunks(iterable: Iterable[Any], chunk_size: int) -> Iterable[Tuple[Any]]:
     tmp = iter(iterable)
     return iter(lambda: tuple(itertools.islice(tmp, chunk_size)), ())
+
+
+def limit_sequences(sequences: Iterable[str], min_length: int = -math.inf, max_length: int = math.inf) -> List[str]:
+
+    assert 0 < min_length <= max_length
+    return list(itertools.chain.from_iterable((
+        pair for pair in split_into_chunks(sequences, 2)
+        if min_length <= len(pair[1]) <= max_length)
+    ))
 
 
 def fasta2csv(path: Union[str, Path], verbose: bool = True) -> None:
@@ -28,7 +38,8 @@ def clean_dbaasp_preds(df: pd.DataFrame) -> pd.DataFrame:
         .rename(columns={0: "Predictive value", 1: "Type"})\
         .drop("Predictive value (Type)", axis=1)
     df["Type"] = df["Type"].str.strip(to_strip="()")
-    df["Class"].map({"Active": 1.0, "Not Active": 0.0}).astype("float64")
+    df["prediction"] = df["Type"].map({"PPV": "AMP", "NPV": "non-AMP"})
+    df["prediction_num"] = (df["prediction"] == "AMP").astype(int)
     df.columns = map(lambda x: x.lower().replace(" ", "_"), df.columns)
     return df
 
@@ -36,6 +47,31 @@ def clean_dbaasp_preds(df: pd.DataFrame) -> pd.DataFrame:
 def clean_amplify_preds(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = df.columns.str.lower()
     df.rename({"probability_score": "score"}, axis="columns", inplace=True)
-    df["prediction_num"] = (df["prediction"] == "AMP").astype("float")
+    df["prediction_num"] = (df["prediction"] == "AMP").astype(int)
+    return df
+
+
+def clean_ampgram_preds(df: pd.DataFrame) -> pd.DataFrame:
+    if df.shape[1] > 2:
+        df.drop("Unnamed: 0", axis="columns", inplace=True)
+    df.rename({
+        "seq_name": "id",
+        "probability": "score"
+    }, axis="columns", inplace=True)
+    df["prediction_num"] = (df["score"] > 0.5).astype("int")
+    df["prediction"] = df["prediction_num"].map({1: "AMP", 0: "non-AMP"})
+    return df
+
+
+def clean_ampscanner_preds(df: pd.DataFrame) -> pd.DataFrame:
+    df.rename({
+        "SeqID": "id",
+        "Prediction_Class": "prediction",
+        "Prediction_Probability": "score",
+    }, axis="columns", inplace=True)
+    df["prediction"] = df["prediction"].str.replace("Non-AMP\*", "non-AMP")\
+        .replace("Non-AMP", "non-AMP").replace("AMP*", "AMP")
+    df["prediction_num"] = (df["prediction"] == "AMP").astype(int)
+    df.columns = df.columns.str.lower()
     return df
 
