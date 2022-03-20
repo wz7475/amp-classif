@@ -1,11 +1,10 @@
 import math
 from pathlib import Path
+from typing import Any, Iterable, List, Tuple, Union
 
 import itertools
 import pandas as pd
 from Bio import SeqIO
-
-from typing import Any, Iterable, List, Tuple, Union
 
 
 def split_into_chunks(iterable: Iterable[Any], chunk_size: int) -> Iterable[Tuple[Any]]:
@@ -20,6 +19,11 @@ def limit_sequences(sequences: Iterable[str], min_length: int = -math.inf, max_l
         pair for pair in split_into_chunks(sequences, 2)
         if min_length <= len(pair[1]) <= max_length)
     ))
+
+
+def ensure_consistency(predictions_df: pd.DataFrame, ground_truth_df: pd.DataFrame) -> None:
+    predictions_df.dropna(subset=["prediction_num"], inplace=True)
+    ground_truth_df.drop(ground_truth_df.index.difference(predictions_df.index), axis="rows", inplace=True)
 
 
 def fasta2csv(path: Union[str, Path], verbose: bool = True) -> None:

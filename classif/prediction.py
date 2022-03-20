@@ -1,6 +1,6 @@
-import Bio
 import io
 
+import Bio
 import pandas as pd
 import requests
 
