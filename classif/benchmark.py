@@ -6,6 +6,7 @@ from typing import NamedTuple
 import numpy as np
 import pandas as pd
 from sklearn import metrics
+from tqdm import tqdm
 
 from classif import config
 from classif import utils
@@ -15,7 +16,7 @@ CONFIG = config.Config()
 
 def benchmark(datasets_dir: str, predictions_dir: str, save_result: bool = True, verbose: bool = True) -> pd.DataFrame:
     result = None
-    for model in sorted(CONFIG.AVAILABLE_MODELS):
+    for model in tqdm(sorted(CONFIG.AVAILABLE_MODELS)):
         model_dir = os.path.join(predictions_dir, model)
         datasets = sorted([os.path.join(datasets_dir, fname)
                            for fname in os.listdir(datasets_dir)
@@ -39,12 +40,13 @@ def benchmark(datasets_dir: str, predictions_dir: str, save_result: bool = True,
             full_ground_truth = np.concatenate([full_ground_truth, y_true])
             full_predictions = np.concatenate([full_predictions, y_pred])
 
-            partial_df = get_benchmark_df(y_true, y_pred, model, predictions_file.split("/")[-1])
+            partial_df = get_benchmark_df(y_true, y_pred, model, ground_truth.split("/")[-1])
             result = pd.concat((result, partial_df), axis="rows") if result is not None else partial_df
 
         model_summary = get_benchmark_df(full_ground_truth, full_predictions, model, dataset_name="OVERALL")
         result = pd.concat((result, model_summary), axis="rows")
 
+    result = result.round(4)
     if save_result:
         result.to_csv(
             os.path.join(predictions_dir, f"benchmark_{datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')}.csv"),

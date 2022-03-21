@@ -1,0 +1,7 @@
+html5lib
+numpy
+# python >= 3.8
+pandas
+requests
+scikit-learn
+tqdm
