@@ -1,10 +1,13 @@
+import itertools
 import math
 from pathlib import Path
 from typing import Any, Iterable, List, Tuple, Union
 
-import itertools
-import pandas as pd
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
+import pandas as pd
+
+from classif.config import Config
 
 
 def split_into_chunks(iterable: Iterable[Any], chunk_size: int) -> Iterable[Tuple[Any]]:
@@ -12,8 +15,12 @@ def split_into_chunks(iterable: Iterable[Any], chunk_size: int) -> Iterable[Tupl
     return iter(lambda: tuple(itertools.islice(tmp, chunk_size)), ())
 
 
-def limit_sequences(sequences: Iterable[str], min_length: int = -math.inf, max_length: int = math.inf) -> List[str]:
+def limit_sequences_length(input_fasta: str, min_length: int = -math.inf, max_length: int = math.inf) -> Iterable[SeqRecord]:
+    sequences = SeqIO.parse(input_fasta, "fasta")
+    return [seq for seq in sequences if min_length <= len(seq.seq) <= max_length]
 
+
+def limit_sequences(sequences: Iterable[str], min_length: int = -math.inf, max_length: int = math.inf) -> List[str]:
     assert 0 < min_length <= max_length
     return list(itertools.chain.from_iterable((
         pair for pair in split_into_chunks(sequences, 2)
@@ -86,3 +93,28 @@ def clean_stm_preds(df: pd.DataFrame) -> pd.DataFrame:
     df["prediction"] = df["prediction"].str.replace("Non-AMP", "non-AMP")
     df["prediction_num"] = (df["prediction"] == "AMP").astype(int)
     return df
+
+
+def clean_campr3_preds(df: pd.DataFrame) -> pd.DataFrame:
+    df.drop("Seq. ID.", axis="columns", inplace=True)
+    df.columns = df.columns.str.lower()
+    df.rename({
+        "class": "prediction",
+        "amp probability": "score",
+    }, axis="columns", inplace=True)
+    df["prediction_num"] = (df["prediction"] == "AMP").astype(int)
+    return df
+
+
+def setup_ampscanner(input_path: str) -> Tuple[List[List[int]], List[str], List[str], List[str]]:
+    X_test, warn, ids, seqs = [], [], [], []
+    aa2int = {aa: i for i, aa in enumerate(Config.AMINO_ACIDS)}
+    for s in SeqIO.parse(input_path, "fasta"):
+        if len(s.seq) < Config.AMPSCANNER_MIN_LENGTH or len(s.seq) > Config.AMPSCANNER_MAX_LENGTH:
+            warn.append("*")
+        else:
+            warn.append("")
+            ids.append(str(s.id))
+            seqs.append(str(s.seq))
+            X_test.append([aa2int[aa] for aa in s.seq.upper()])
+    return X_test, warn, ids, seqs

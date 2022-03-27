@@ -14,6 +14,10 @@ class Config:
         "dbaasp_species",
         # "iamp",
         "stm",
+        "campr3_svm",
+        "campr3_rf",
+        "campr3_ann",
+        "campr3_da",
     })
 
     CAMPR3_URL = "http://www.camp.bicnirrh.res.in/predict/hii.php"
@@ -30,6 +34,16 @@ class Config:
         "Candida albicans",
         "Saccharomyces cerevisiae",
     ])
-    DBAASP_CHUNK_SIZE: int = 400
 
+    DBAASP_CHUNK_SIZE: int = 400
     AMPSCANNER_MAX_LENGTH: int = 200
+    AMPSCANNER_MIN_LENGTH: int = 10
+    AMPSCANNER_THRESHOLD: float = 0.5
+
+    AMPSCANNER_MODEL_PATH: str = "../resources/models/ampscannerv2_021820_full_model.h5"
+    CAMPR3_AVAILABLE_MODELS: List[str] = field(default_factory=lambda: [
+        "campr3_svm",
+        "campr3_rf",
+        "campr3_ann",
+        "campr3_da",
+    ])
