@@ -20,8 +20,9 @@ class Config:
         "campr3_da",
     })
 
-    CAMPR3_URL = "http://www.camp.bicnirrh.res.in/predict/hii.php"
-    DBAASP_URL: str = "https://dbaasp.org/prediction/special/"
+    CAMPR3_URL: str = "http://www.camp.bicnirrh.res.in/predict/hii.php"
+    DBAASP_GENERAL_URL: str = "https://dbaasp.org/prediction/general"
+    DBAASP_STRAIN_URL: str = "https://dbaasp.org/prediction/special/"
     STM_URL: str = "https://www.portoreports.com/stm"
 
     DBAASP_STRAINS: List[str] = field(default_factory=lambda: [

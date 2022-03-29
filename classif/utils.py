@@ -45,11 +45,16 @@ def fasta2csv(path: Union[str, Path], verbose: bool = True) -> None:
 
 
 def clean_dbaasp_preds(df: pd.DataFrame) -> pd.DataFrame:
-    df = pd.concat((df, df['Predictive value (Type)'].str.split(" ", expand=True)), axis=1)\
-        .rename(columns={0: "Predictive value", 1: "Type"})\
-        .drop("Predictive value (Type)", axis=1)
-    df["Type"] = df["Type"].str.strip(to_strip="()")
-    df["prediction"] = df["Type"].map({"PPV": "AMP", "NPV": "non-AMP"})
+    if len(df.columns) > 2:
+        df = pd.concat((df, df['Predictive value (Type)'].str.split(" ", expand=True)), axis=1)\
+            .rename(columns={0: "Predictive value", 1: "Type"})\
+            .drop("Predictive value (Type)", axis=1)
+        df["Type"] = df["Type"].str.strip(to_strip="()")
+        df["prediction"] = df["Type"].map({"PPV": "AMP", "NPV": "non-AMP"})
+    if "Class" in df.columns:
+        # print(df.columns)
+        df.drop(index=df.index[-1], axis=0, inplace=True)  # drop last row (DBAASP info boilerplate)
+        df.rename({"Class": "prediction"}, axis="columns", inplace=True)
     df["prediction_num"] = (df["prediction"] == "AMP").astype(int)
     df.columns = map(lambda x: x.lower().replace(" ", "_"), df.columns)
     return df
