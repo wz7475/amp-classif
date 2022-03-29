@@ -92,10 +92,10 @@ def get_campr3_predictions(payload: str, verbose: bool = True) -> Dict[str, pd.D
         fields = {
             "S1": payload,
             "userfile": ("", b'', "application/octet-stream"),
-            "checkall": "on",
-            "algo[]": (None, "svm"),
-            "algo[]": (None, "rf"),
-            "algo[]": (None, "rf"),
+            # "checkall": "on",
+            "algo[]": (None, algo),
+            # "algo[]": (None, "rf"),
+            # "algo[]": (None, "rf"),
             "B1": "Submit",
         }
         boundary = "----WebKitFormBoundary" + "".join(random.sample(string.ascii_letters + string.digits, 16))
@@ -104,8 +104,10 @@ def get_campr3_predictions(payload: str, verbose: bool = True) -> Dict[str, pd.D
         status = response.status_code
         if verbose:
             print(f"request status: {status}")
+        df = pd.read_html(response.content)[3]
+        print(df)
         df = utils.clean_campr3_preds(pd.read_html(response.content)[3]) if status == 200 else None
-        result[algo] = df
+        result[f"campr3_{algo}"] = df
     return result
 
 

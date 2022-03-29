@@ -43,8 +43,8 @@ class Config:
 
     AMPSCANNER_MODEL_PATH: str = "../resources/models/ampscannerv2_021820_full_model.h5"
     CAMPR3_AVAILABLE_MODELS: List[str] = field(default_factory=lambda: [
-        "campr3_svm",
-        "campr3_rf",
-        "campr3_ann",
-        "campr3_da",
+        "svm",
+        "rf",
+        "ann",
+        "da",
     ])

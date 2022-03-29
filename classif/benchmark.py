@@ -69,7 +69,11 @@ def get_benchmark_df(y_true: np.ndarray, y_pred: np.ndarray, model_name: str = "
 
 
 def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> NamedTuple:
-    tn, fp, fn, tp = metrics.confusion_matrix(y_true, y_pred).ravel()
+    # print(f"y_true: {y_true}, y_pred: {y_pred}")
+    # print("Confusion matrix:")
+    # print(metrics.confusion_matrix(y_true, y_pred))
+    # print(metrics.confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel())
+    tn, fp, fn, tp = metrics.confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel()
     tpr = tp / (tp + fn) if (tp + fn) else np.nan
     tnr = tn / (tn + fp) if (tn + fp) else np.nan
     fpr = 1 - tnr  # np.nan propagates
