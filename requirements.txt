@@ -1,0 +1,11 @@
+biopython
+html5lib
+numpy
+# python >= 3.8
+pandas
+requests
+requests-toolbelt
+scikit-learn
+tqdm
+tensorflow >= 2.0.0
+keras
