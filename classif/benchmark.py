@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import os
 from collections import namedtuple
 from typing import NamedTuple
@@ -14,9 +15,12 @@ from classif import utils
 CONFIG = config.Config()
 
 
-def benchmark(datasets_dir: str, predictions_dir: str, save_result: bool = True, verbose: bool = True) -> pd.DataFrame:
+def benchmark(datasets_dir: str, predictions_dir: str, mode: str = "amp", save_result: bool = True,
+              verbose: bool = True) -> pd.DataFrame:
+    assert mode in ("amp", "toxicity")
+    available_models = CONFIG.AVAILABLE_MODELS if mode == "amp" else CONFIG.TOXICITY_MODELS
     result = None
-    for model in tqdm(sorted(CONFIG.AVAILABLE_MODELS)):
+    for model in tqdm(sorted(available_models)):
         model_dir = os.path.join(predictions_dir, model)
         datasets = sorted([os.path.join(datasets_dir, fname)
                            for fname in os.listdir(datasets_dir)
@@ -82,3 +86,28 @@ def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> NamedTuple:
     accuracy = metrics.accuracy_score(y_true, y_pred)
     Metrics = namedtuple("Metrics", "tpr tnr fpr fnr f1_score accuracy")
     return Metrics._make((tpr, tnr, fpr, fnr, f1_score, accuracy))
+
+
+def grid_search_weights(training_set: pd.DataFrame, grid_scale: float = 0.01, mode: str = "unit_sum",
+                        top_k: int = 100, verbose: bool = True) -> pd.DataFrame:
+    assert 0. < grid_scale < 1.
+    assert mode in ("unit_sum", "full_cube")
+    if verbose:
+        print(f"Generating grid of weights; grid resolution: {grid_scale}")
+    grid = utils.generate_weights_grid(by=grid_scale) if mode == "unit_sum" \
+        else np.array(list(itertools.combinations(np.arange(0., 1+grid_scale, grid_scale), 3)))
+    scores = dict()
+    if verbose:
+        print("Running grid search...")
+    for i, weights in enumerate(tqdm(grid)):
+        training_set["score"] = (
+                training_set[[f"{name}_score" for name in CONFIG.MODELS_FOR_CANDIDATE_SELECTION]] * weights).sum(axis=1)
+        eval_score = top_k_fraction_of_ones(training_set, k=top_k)
+        scores[i] = (weights, eval_score)
+    return pd.DataFrame([t for _, t in scores.items()],
+                        columns=["weights", "metric"]).sort_values(by="metric", ascending=False)
+
+
+def top_k_fraction_of_ones(predictions: pd.DataFrame, k: int = 100) -> float:
+    ranked = predictions.sort_values(by="score", ascending=False)
+    return ranked["class"][:k].sum() / k
