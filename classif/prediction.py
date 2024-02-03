@@ -10,6 +10,9 @@ def predict_dbaasp(input_path: str, strain: str = "Escherichia coli ATCC 25922",
         payload = "".join(f.readlines())
     if verbose:
         print("Sending prediction request to DBAASP...")
+    """
+    got 400 Bad request - API changed
+    """
     response = requests.post(
         url=config.DBAASP_URL,
         data={
