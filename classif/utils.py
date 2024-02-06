@@ -10,6 +10,10 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
+"""
+requires package: amp
+from https://github.com/szczurek-lab/hydramp
+"""
 from amp.inference.filtering import amino_based_filtering
 from classif.config import Config
 
