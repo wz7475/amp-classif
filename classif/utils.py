@@ -81,7 +81,7 @@ def prototypes2csv(input_file: Union[str, Path]) -> pd.DataFrame:
     )
 
 
-def preprocess_candidates(df: pd.DataFrame, positive_path: str = "../resources/hydramp_data/unlabelled_positive.csv",
+def preprocess_candidates(df: pd.DataFrame, positive_path: str = "resources/hydramp_data/unlabelled_positive.csv",
                           verbose: bool = True) -> pd.DataFrame:
     size_before = df.shape[0]
     df = amino_based_filtering(positive_path, df)

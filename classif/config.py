@@ -60,7 +60,7 @@ class Config:
     AMPSCANNER_MIN_LENGTH: int = 10
     AMPSCANNER_THRESHOLD: float = 0.5
 
-    AMPSCANNER_MODEL_PATH: str = "../resources/models/ampscannerv2_021820_full_model.h5"
+    AMPSCANNER_MODEL_PATH: str = "resources/models/ampscannerv2_021820_full_model.h5"
     CAMPR3_AVAILABLE_MODELS: List[str] = field(default_factory=lambda: [
         "svm",
         "rf",

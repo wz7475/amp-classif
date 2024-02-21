@@ -83,10 +83,6 @@ def predict_stm(input_path: str, output_dir: str = "", verbose: bool = True) -> 
         print(f"saved predictions to {outfile}")
 
 if __name__ == "__main__":
-    # predict_stm('resources/TEST.fasta', 'data')
-    # predict_campr3('resources/TEST.fasta', 'data')
-    predict_ampscanner('resources/TEST.fasta', 'data')
-    # predict_dbaasp('data/amp_high.fasta', 'data')
-    # predict_dbaasp_genome('data/amp_high.fasta', 'data')
-    # predict_campr3('data/amp_high.fasta', 'data')
-    # predict_stm('data/amp_high.fasta', 'data')
+    predict_stm('resources/TEST.fasta', 'outputs')
+    # predict_ampscanner('resources/TEST.fasta', 'outputs')
+    
