@@ -1,4 +1,3 @@
-from classif.stm.api import predict_stm
 from classif.ampscannerv2.api import predict_ampscanner
 
 if __name__ == "__main__":
