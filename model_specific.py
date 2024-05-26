@@ -2,7 +2,7 @@
 
 import os
 import pandas as pd
-from tools.converter import Converter
+from tools.converter import Converter, InputConverter
 from tools.inference import Inferencer
 
 
@@ -20,3 +20,8 @@ class ConcreteInferencer(Inferencer):
         command = f"python -m classif.inference -i {filepath} -o {output_filename}"
         print(command)
         os.system(command)
+
+class ConcreteInputConverter(InputConverter):
+    def process_file(self, filepath: str, output_filename: str):
+        """ implement for specific model """
+        pass
