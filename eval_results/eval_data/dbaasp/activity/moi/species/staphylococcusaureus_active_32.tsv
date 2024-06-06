@@ -1,4 +1,4 @@
-id	Prediction	score	sequence	prediction_num
+id	Prediction	Probability_score	sequence	prediction_num
 DBAASP_3951	AMP	1.0	FLGKVFKLASKVFPAVFGKV	1
 DBAASP_20403	AMP	1.0	GLLGKVLGVGKKVLC	1
 DBAASP_13063	AMP	1.0	GWGCNIFGGNDYRCHRHCKSIKGYKGGYCKLGGICKCY	1

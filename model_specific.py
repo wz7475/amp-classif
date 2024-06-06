@@ -10,7 +10,7 @@ class ConcreteConverter(Converter):
     def process_file(self, filepath: str, output_filename: str):
         """ implement for specific model """
         df = pd.read_csv(filepath, delimiter=",")
-        df.rename(columns={"prediction": "Prediction"}, inplace=True)
+        df.rename(columns={"prediction": "Prediction", "score": "Probability_score"}, inplace=True)
         df.to_csv(output_filename, sep="\t", index=False)
 
 
